@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Article-Counting-App</string>
+    <string name="article_list_title">Article List</string>
+    <string name="add_article_content_description">Add article</string>
+    <string name="create_article_title">Create a new Article</string>
+    <string name="article_name_label">Input for Article Name</string>
+    <string name="article_number_label">Input for Article Number</string>
+    <string name="count_input_label">Input for Pieces of Article</string>
+    <string name="save">SAVE</string>
 </resources>

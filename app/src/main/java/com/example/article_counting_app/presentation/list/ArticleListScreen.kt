@@ -27,8 +27,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.article_counting_app.R
 import com.example.article_counting_app.domain.model.Article
 
 @Composable
@@ -40,9 +42,19 @@ fun ArticleListScreen(
     val state by viewModel.uiState.collectAsState()
 
     Scaffold(
+        topBar = {
+            Text(
+                text = stringResource(R.string.article_list_title),
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 4.dp)
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddClick) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add article")
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.add_article_content_description)
+                )
             }
         }
     ) { innerPadding ->

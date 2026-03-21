@@ -6,8 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.article_counting_app.presentation.common.CountArticlePlaceholderScreen
-import com.example.article_counting_app.presentation.common.CreateArticlePlaceholderScreen
+import com.example.article_counting_app.presentation.count.CountArticleScreen
+import com.example.article_counting_app.presentation.create.CreateArticleScreen
 import com.example.article_counting_app.presentation.list.ArticleListScreen
 
 @Composable
@@ -27,13 +27,19 @@ fun ArticleNavHost() {
             )
         }
         composable(route = Routes.CreateArticle.route) {
-            CreateArticlePlaceholderScreen()
+            CreateArticleScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
         composable(
             route = Routes.CountArticle.route,
             arguments = listOf(navArgument("articleId") { type = NavType.StringType })
-        ) {
-            CountArticlePlaceholderScreen()
+        ) { backStackEntry ->
+            val articleId = backStackEntry.arguments?.getString("articleId").orEmpty()
+            CountArticleScreen(
+                articleId = articleId,
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }
