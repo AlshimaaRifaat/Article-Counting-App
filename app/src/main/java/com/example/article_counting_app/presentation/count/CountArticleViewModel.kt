@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.article_counting_app.di.AppContainer
+import com.example.article_counting_app.domain.validation.ArticleInputValidator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -43,13 +44,14 @@ class CountArticleViewModel(
 
     fun onSave() {
         val count = _uiState.value.countInput.toIntOrNull()
-        if (count == null || count !in 0..999) {
-            _uiState.value = _uiState.value.copy(countError = "Count must be a number between 0 and 999.")
+        val countError = ArticleInputValidator.validateCount(count)
+        if (countError != null) {
+            _uiState.value = _uiState.value.copy(countError = countError)
             return
         }
 
         viewModelScope.launch {
-            AppContainer.updateArticleCountUseCase(articleId = articleId, count = count)
+            AppContainer.updateArticleCountUseCase(articleId = articleId, count = count!!)
             _uiState.value = _uiState.value.copy(shouldNavigateBack = true)
         }
     }

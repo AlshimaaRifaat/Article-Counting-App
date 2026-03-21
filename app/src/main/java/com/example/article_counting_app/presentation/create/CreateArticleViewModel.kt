@@ -3,6 +3,7 @@ package com.example.article_counting_app.presentation.create
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.article_counting_app.di.AppContainer
+import com.example.article_counting_app.domain.validation.ArticleInputValidator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,20 +35,10 @@ class CreateArticleViewModel : ViewModel() {
         val name = current.name.trim()
         val number = current.number.trim()
 
-        var hasError = false
-        var nameError: String? = null
-        var numberError: String? = null
+        val nameError = ArticleInputValidator.validateArticleName(name)
+        val numberError = ArticleInputValidator.validateArticleNumber(number)
 
-        if (name.length < 3) {
-            nameError = "Name must contain at least 3 characters."
-            hasError = true
-        }
-        if (number.length != 7) {
-            numberError = "Article number must be exactly 7 digits."
-            hasError = true
-        }
-
-        if (hasError) {
+        if (nameError != null || numberError != null) {
             _uiState.value = current.copy(nameError = nameError, numberError = numberError)
             return
         }
