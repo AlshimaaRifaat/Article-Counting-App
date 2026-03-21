@@ -24,15 +24,15 @@ fun CountArticleScreen(
     articleId: String,
     onNavigateBack: () -> Unit
 ) {
-    val viewModel: CountArticleViewModel = viewModel(
+    val vm: CountArticleViewModel = viewModel(
         factory = CountArticleViewModelFactory(articleId)
     )
-    val state by viewModel.uiState.collectAsState()
+    val state by vm.uiState.collectAsState()
 
     LaunchedEffect(state.shouldNavigateBack) {
         if (state.shouldNavigateBack) {
             onNavigateBack()
-            viewModel.onNavigatedBack()
+            vm.onNavigatedBack()
         }
     }
 
@@ -48,7 +48,7 @@ fun CountArticleScreen(
         )
         OutlinedTextField(
             value = state.countInput,
-            onValueChange = viewModel::onCountChange,
+            onValueChange = vm::onCountChange,
             modifier = Modifier.fillMaxWidth(),
             label = { Text(stringResource(R.string.count_input_label)) },
             singleLine = true,
@@ -59,7 +59,7 @@ fun CountArticleScreen(
         }
 
         Button(
-            onClick = viewModel::onSave,
+            onClick = vm::onSave,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.save))
