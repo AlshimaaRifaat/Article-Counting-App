@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.article_counting_app.di.AppContainer
+import com.example.article_counting_app.domain.model.Article
 import com.example.article_counting_app.domain.validation.ArticleInputValidator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +20,14 @@ data class CountArticleUiState(
 )
 
 class CountArticleViewModel(
-    private val articleId: String
+    private val articleId: String,
+    private val getArticleById: suspend (String) -> Article? = { id ->
+        AppContainer.getArticleByIdUseCase(id)
+    },
+    private val updateArticleCount: suspend (String, Int) -> Unit = { id, count ->
+        AppContainer.updateArticleCountUseCase(articleId = id, count = count)
+    },
+    private val validateCount: (Int?) -> String? = ArticleInputValidator::validateCount
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CountArticleUiState(articleId = articleId))
@@ -27,7 +35,7 @@ class CountArticleViewModel(
 
     init {
         viewModelScope.launch {
-            val article = AppContainer.getArticleByIdUseCase(articleId)
+            val article = getArticleById(articleId)
             if (article != null) {
                 _uiState.value = _uiState.value.copy(
                     title = "Count ${article.name}",
@@ -44,14 +52,14 @@ class CountArticleViewModel(
 
     fun onSave() {
         val count = _uiState.value.countInput.toIntOrNull()
-        val countError = ArticleInputValidator.validateCount(count)
+        val countError = validateCount(count)
         if (countError != null) {
             _uiState.value = _uiState.value.copy(countError = countError)
             return
         }
 
         viewModelScope.launch {
-            AppContainer.updateArticleCountUseCase(articleId = articleId, count = count!!)
+            updateArticleCount(articleId, count!!)
             _uiState.value = _uiState.value.copy(shouldNavigateBack = true)
         }
     }

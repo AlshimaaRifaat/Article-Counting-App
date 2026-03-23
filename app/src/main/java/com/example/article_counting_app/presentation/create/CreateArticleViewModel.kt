@@ -17,7 +17,13 @@ data class CreateArticleUiState(
     val shouldNavigateBack: Boolean = false
 )
 
-class CreateArticleViewModel : ViewModel() {
+class CreateArticleViewModel(
+    private val addArticle: suspend (String, String) -> Unit = { name, number ->
+        AppContainer.addArticleUseCase(name = name, number = number)
+    },
+    private val validateName: (String) -> String? = ArticleInputValidator::validateArticleName,
+    private val validateNumber: (String) -> String? = ArticleInputValidator::validateArticleNumber
+) : ViewModel() {
     private val _uiState = MutableStateFlow(CreateArticleUiState())
     val uiState: StateFlow<CreateArticleUiState> = _uiState.asStateFlow()
 
@@ -35,8 +41,8 @@ class CreateArticleViewModel : ViewModel() {
         val name = current.name.trim()
         val number = current.number.trim()
 
-        val nameError = ArticleInputValidator.validateArticleName(name)
-        val numberError = ArticleInputValidator.validateArticleNumber(number)
+        val nameError = validateName(name)
+        val numberError = validateNumber(number)
 
         if (nameError != null || numberError != null) {
             _uiState.value = current.copy(nameError = nameError, numberError = numberError)
@@ -44,7 +50,7 @@ class CreateArticleViewModel : ViewModel() {
         }
 
         viewModelScope.launch {
-            AppContainer.addArticleUseCase(name = name, number = number)
+            addArticle(name, number)
             _uiState.value = _uiState.value.copy(shouldNavigateBack = true)
         }
     }
